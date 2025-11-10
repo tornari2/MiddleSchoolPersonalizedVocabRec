@@ -1,0 +1,31 @@
+# Environment variables and secrets
+.env
+.env.local
+.env.*.local
+
+# API keys and credentials
+*.key
+*.pem
+credentials.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
