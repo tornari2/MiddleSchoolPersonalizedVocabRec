@@ -1,0 +1,35 @@
+{
+  "total_samples": 60,
+  "samples_by_type": {
+    "conversation": 20,
+    "written_essay": 14,
+    "written_paragraph": 26
+  },
+  "samples_by_grade": {
+    "6": 30,
+    "7": 30
+  },
+  "vocabulary_usage": {
+    "variety": 3,
+    "remove": 3,
+    "component": 3,
+    "structure": 3,
+    "factor": 3,
+    "develop": 2,
+    "necessary": 2,
+    "select": 2,
+    "positive": 2,
+    "involved": 2,
+    "independent": 2,
+    "united": 2,
+    "economy": 2,
+    "benefit": 2,
+    "logical": 2,
+    "range": 2,
+    "multiple": 2,
+    "exist": 2,
+    "role": 2,
+    "interpret": 2
+  },
+  "generation_timestamp": "2025-11-10T20:50:16.898841"
+}

@@ -1,0 +1,516 @@
+{
+  "metadata": {
+    "description": "Dictionary definitions for vocabulary words used in recommendation system",
+    "source": "Educational dictionaries and academic resources",
+    "total_words": 200,
+    "last_updated": "2025-11-11",
+    "format": "word: {definition: string, part_of_speech: string, examples: [string]}"
+  },
+  "definitions": {
+    "analysis": {
+      "definition": "The process of examining something in detail to understand its nature or to determine its essential features",
+      "part_of_speech": "noun",
+      "examples": ["The scientist conducted a thorough analysis of the data.", "Critical analysis is essential for understanding complex issues."]
+    },
+    "approach": {
+      "definition": "A way of dealing with something; a method or procedure",
+      "part_of_speech": "noun",
+      "examples": ["The teacher used a new approach to teaching mathematics.", "We need a systematic approach to solving this problem."]
+    },
+    "area": {
+      "definition": "A region or part of a town, a country, or the world",
+      "part_of_speech": "noun",
+      "examples": ["This area of the city has many restaurants.", "The park covers a large area."]
+    },
+    "assessment": {
+      "definition": "The act of judging or deciding the amount, value, quality, or importance of something",
+      "part_of_speech": "noun",
+      "examples": ["The teacher gave a fair assessment of the student's work.", "Environmental assessment is required before building projects."]
+    },
+    "assume": {
+      "definition": "To think or accept that something is true but without proof",
+      "part_of_speech": "verb",
+      "examples": ["I assume you're coming to the meeting.", "Don't assume that everyone agrees with you."]
+    },
+    "authority": {
+      "definition": "The power or right to give orders, make decisions, and enforce obedience",
+      "part_of_speech": "noun",
+      "examples": ["The principal has authority over the school.", "Local authorities are responsible for road maintenance."]
+    },
+    "available": {
+      "definition": "Able to be used or obtained; at someone's disposal",
+      "part_of_speech": "adjective",
+      "examples": ["The book is available at the library.", "Tickets are available online."]
+    },
+    "benefit": {
+      "definition": "An advantage or profit gained from something",
+      "part_of_speech": "noun",
+      "examples": ["Exercise has many health benefits.", "The new policy will benefit all students."]
+    },
+    "challenge": {
+      "definition": "A difficult task or problem that tests someone's ability or determination",
+      "part_of_speech": "noun",
+      "examples": ["Climbing Mount Everest is a major challenge.", "The math problem presented a real challenge."]
+    },
+    "character": {
+      "definition": "The combination of qualities or features that distinguishes one person, group, or thing from another",
+      "part_of_speech": "noun",
+      "examples": ["Honesty is an important character trait.", "The story has many interesting characters."]
+    },
+    "communicate": {
+      "definition": "To share or exchange information, news, or ideas",
+      "part_of_speech": "verb",
+      "examples": ["Students should learn to communicate effectively.", "The scientist communicated her findings to the public."]
+    },
+    "compare": {
+      "definition": "To examine people or things to note similarities and differences",
+      "part_of_speech": "verb",
+      "examples": ["Compare the two paintings and note their differences.", "You cannot compare apples and oranges."]
+    },
+    "component": {
+      "definition": "One of several parts that together make up a whole",
+      "part_of_speech": "noun",
+      "examples": ["The computer has many electronic components.", "Teamwork is a key component of success."]
+    },
+    "consider": {
+      "definition": "To think carefully about something, especially when making a decision",
+      "part_of_speech": "verb",
+      "examples": ["Please consider my proposal carefully.", "We must consider all options before deciding."]
+    },
+    "construct": {
+      "definition": "To build or make something, especially something that is large or complicated",
+      "part_of_speech": "verb",
+      "examples": ["Workers are constructing a new bridge.", "The scientist constructed a hypothesis."]
+    },
+    "context": {
+      "definition": "The situation in which something happens and that helps you understand it",
+      "part_of_speech": "noun",
+      "examples": ["You need to understand the historical context.", "The word has a different meaning in this context."]
+    },
+    "contribute": {
+      "definition": "To give something, especially money or help, for a common purpose",
+      "part_of_speech": "verb",
+      "examples": ["Everyone should contribute to the charity.", "Hard work contributes to success."]
+    },
+    "coordinate": {
+      "definition": "To make different things work together effectively",
+      "part_of_speech": "verb",
+      "examples": ["The coach coordinates the team's activities.", "We need to coordinate our efforts."]
+    },
+    "core": {
+      "definition": "The central or most important part of something",
+      "part_of_speech": "noun",
+      "examples": ["Reading is at the core of the curriculum.", "The core of the earth is very hot."]
+    },
+    "create": {
+      "definition": "To make or invent something new",
+      "part_of_speech": "verb",
+      "examples": ["Artists create beautiful paintings.", "Scientists create new technologies."]
+    },
+    "culture": {
+      "definition": "The customs, arts, social institutions, and achievements of a particular nation, people, or other social group",
+      "part_of_speech": "noun",
+      "examples": ["Learning about different cultures is important.", "School culture affects student learning."]
+    },
+    "design": {
+      "definition": "To plan and make a drawing of how something will be made",
+      "part_of_speech": "verb",
+      "examples": ["The architect designed a beautiful building.", "Scientists design experiments."]
+    },
+    "detail": {
+      "definition": "A single fact or piece of information about something",
+      "part_of_speech": "noun",
+      "examples": ["The report includes many important details.", "Pay attention to the details."]
+    },
+    "develop": {
+      "definition": "To grow or cause to grow and become more mature, advanced, or elaborate",
+      "part_of_speech": "verb",
+      "examples": ["Children develop physically and mentally.", "The company is developing new products."]
+    },
+    "device": {
+      "definition": "An object or machine that has been invented for a particular purpose",
+      "part_of_speech": "noun",
+      "examples": ["Smartphones are useful devices.", "The scientist invented a new device."]
+    },
+    "document": {
+      "definition": "To record something in written form",
+      "part_of_speech": "verb",
+      "examples": ["The researcher documented her observations.", "Please document your sources."]
+    },
+    "dominant": {
+      "definition": "More important, powerful, or noticeable than others",
+      "part_of_speech": "adjective",
+      "examples": ["The dominant color in the painting is blue.", "One political party is dominant in that country."]
+    },
+    "economy": {
+      "definition": "The system by which a country's money and goods are produced and used",
+      "part_of_speech": "noun",
+      "examples": ["The economy is growing rapidly.", "We need to be economical with our resources."]
+    },
+    "environment": {
+      "definition": "The conditions that affect the behavior and development of someone or something",
+      "part_of_speech": "noun",
+      "examples": ["Protecting the environment is important.", "School environment affects learning."]
+    },
+    "equipped": {
+      "definition": "Having the necessary tools or skills for a particular purpose",
+      "part_of_speech": "adjective",
+      "examples": ["The laboratory is well equipped.", "Students are equipped with knowledge."]
+    },
+    "establish": {
+      "definition": "To start or create an organization, system, etc. that is meant to last for a long time",
+      "part_of_speech": "verb",
+      "examples": ["The school was established in 1950.", "Scientists establish theories."]
+    },
+    "evaluate": {
+      "definition": "To judge or calculate the quality, importance, amount, or value of something",
+      "part_of_speech": "verb",
+      "examples": ["Teachers evaluate student work.", "We need to evaluate the results."]
+    },
+    "evidence": {
+      "definition": "The available body of facts or information indicating whether a belief or proposition is true or valid",
+      "part_of_speech": "noun",
+      "examples": ["There is strong evidence for climate change.", "The detective found evidence at the crime scene."]
+    },
+    "factor": {
+      "definition": "One of several things that cause or influence something",
+      "part_of_speech": "noun",
+      "examples": ["Weather is a factor in crop growth.", "Many factors influence student success."]
+    },
+    "feature": {
+      "definition": "A distinctive attribute or aspect of something",
+      "part_of_speech": "noun",
+      "examples": ["This phone has many useful features.", "Geographic features include mountains and rivers."]
+    },
+    "focus": {
+      "definition": "To give attention to one particular person, thing, or situation",
+      "part_of_speech": "verb",
+      "examples": ["The teacher focuses on student needs.", "Please focus on your homework."]
+    },
+    "function": {
+      "definition": "The purpose for which something is designed or exists",
+      "part_of_speech": "noun",
+      "examples": ["The function of the heart is to pump blood.", "What is the function of this machine?"]
+    },
+    "furthermore": {
+      "definition": "In addition to what has been said; moreover",
+      "part_of_speech": "adverb",
+      "examples": ["The test was difficult. Furthermore, we had little time.", "Furthermore, the results were unexpected."]
+    },
+    "gender": {
+      "definition": "The state of being male or female",
+      "part_of_speech": "noun",
+      "examples": ["Gender equality is important.", "Some languages have gender-specific words."]
+    },
+    "generate": {
+      "definition": "To produce or create something",
+      "part_of_speech": "verb",
+      "examples": ["Solar panels generate electricity.", "The computer generates random numbers."]
+    },
+    "generation": {
+      "definition": "All the people who were born at approximately the same time",
+      "part_of_speech": "noun",
+      "examples": ["The younger generation uses technology differently.", "Each generation faces unique challenges."]
+    },
+    "globe": {
+      "definition": "The earth; the world",
+      "part_of_speech": "noun",
+      "examples": ["People travel around the globe.", "The globe is warming due to climate change."]
+    },
+    "goal": {
+      "definition": "The result or achievement toward which effort is directed",
+      "part_of_speech": "noun",
+      "examples": ["Education is an important goal.", "The team's goal is to win the championship."]
+    },
+    "grant": {
+      "definition": "To agree to give or allow something to someone",
+      "part_of_speech": "verb",
+      "examples": ["The school granted permission for the field trip.", "The foundation grants scholarships."]
+    },
+    "hierarchy": {
+      "definition": "A system in which people or things are placed in a series of levels with different importance or status",
+      "part_of_speech": "noun",
+      "examples": ["School has a hierarchy of administrators.", "Animal species form a hierarchy."]
+    },
+    "identify": {
+      "definition": "To recognize someone or something and say or prove who or what they are",
+      "part_of_speech": "verb",
+      "examples": ["Can you identify this plant?", "The scientist identified the new species."]
+    },
+    "impact": {
+      "definition": "A marked effect or influence",
+      "part_of_speech": "noun",
+      "examples": ["The storm had a major impact on the city.", "Social media has a big impact on society."]
+    },
+    "implement": {
+      "definition": "To put a plan, system, or agreement into action",
+      "part_of_speech": "verb",
+      "examples": ["The school implemented a new curriculum.", "We need to implement these changes."]
+    },
+    "individual": {
+      "definition": "A single person or thing, especially when compared to the group or set to which they belong",
+      "part_of_speech": "noun",
+      "examples": ["Each individual has unique talents.", "Respect individual differences."]
+    },
+    "influence": {
+      "definition": "The effect that a person or thing has on the way another person thinks or behaves",
+      "part_of_speech": "noun",
+      "examples": ["Parents have a strong influence on children.", "Social media influences public opinion."]
+    },
+    "infrastructure": {
+      "definition": "The basic systems and services that are needed for a country or organization to run smoothly",
+      "part_of_speech": "noun",
+      "examples": ["The city needs better infrastructure.", "Digital infrastructure supports modern education."]
+    },
+    "involved": {
+      "definition": "Being included in an activity or situation",
+      "part_of_speech": "adjective",
+      "examples": ["Many students are involved in sports.", "The project involved complex calculations."]
+    },
+    "issue": {
+      "definition": "A subject or problem that people are thinking and talking about",
+      "part_of_speech": "noun",
+      "examples": ["Climate change is an important issue.", "The magazine issues monthly publications."]
+    },
+    "labor": {
+      "definition": "Work, especially physical work",
+      "part_of_speech": "noun",
+      "examples": ["Farmers do hard physical labor.", "Labor laws protect workers' rights."]
+    },
+    "legal": {
+      "definition": "Allowed or permitted by law",
+      "part_of_speech": "adjective",
+      "examples": ["Smoking is not legal in schools.", "The lawyer gave legal advice."]
+    },
+    "legislation": {
+      "definition": "A law or set of laws suggested by a government and made official by a parliament",
+      "part_of_speech": "noun",
+      "examples": ["New legislation protects the environment.", "Congress passes legislation."]
+    },
+    "locate": {
+      "definition": "To find the exact position of something or someone",
+      "part_of_speech": "verb",
+      "examples": ["Can you locate the library on the map?", "The company will locate in the city center."]
+    },
+    "logical": {
+      "definition": "Reasonable and based on good judgment",
+      "part_of_speech": "adjective",
+      "examples": ["That is a logical conclusion.", "Use logical thinking to solve problems."]
+    },
+    "maintain": {
+      "definition": "To keep something in good condition by checking or repairing it regularly",
+      "part_of_speech": "verb",
+      "examples": ["Maintain good health through exercise.", "The mechanic maintains the cars."]
+    },
+    "major": {
+      "definition": "Important, serious, or significant",
+      "part_of_speech": "adjective",
+      "examples": ["This is a major decision.", "Math is his major subject."]
+    },
+    "method": {
+      "definition": "A particular way of doing something",
+      "part_of_speech": "noun",
+      "examples": ["Scientists use the scientific method.", "What method do you use to study?"]
+    },
+    "occur": {
+      "definition": "To happen or take place",
+      "part_of_speech": "verb",
+      "examples": ["The accident occurred yesterday.", "Earthquakes occur along fault lines."]
+    },
+    "percent": {
+      "definition": "One part in every hundred",
+      "part_of_speech": "noun",
+      "examples": ["Ninety percent of students passed.", "The battery is at 50 percent."]
+    },
+    "period": {
+      "definition": "A length of time",
+      "part_of_speech": "noun",
+      "examples": ["The Jurassic period lasted millions of years.", "We have a study period after lunch."]
+    },
+    "policy": {
+      "definition": "A plan of action agreed or chosen by a government, business, etc.",
+      "part_of_speech": "noun",
+      "examples": ["School policy prohibits bullying.", "The company has a new privacy policy."]
+    },
+    "principle": {
+      "definition": "A fundamental truth or proposition that serves as the foundation for a system of belief",
+      "part_of_speech": "noun",
+      "examples": ["Honesty is an important principle.", "The principle of democracy is rule by the people."]
+    },
+    "procedure": {
+      "definition": "A way of doing something, especially the usual or correct way",
+      "part_of_speech": "noun",
+      "examples": ["Follow the safety procedure.", "What is the procedure for applying?"]
+    },
+    "process": {
+      "definition": "A series of actions or steps taken in order to achieve a particular end",
+      "part_of_speech": "noun",
+      "examples": ["The digestive process takes time.", "Learning is a gradual process."]
+    },
+    "provide": {
+      "definition": "To make something available to someone",
+      "part_of_speech": "verb",
+      "examples": ["Schools provide education.", "The company provides health insurance."]
+    },
+    "range": {
+      "definition": "The area between limits within which something can operate or take place",
+      "part_of_speech": "noun",
+      "examples": ["The mountain range is beautiful.", "Temperatures range from hot to cold."]
+    },
+    "region": {
+      "definition": "A large area of land, usually with particular features",
+      "part_of_speech": "noun",
+      "examples": ["The coastal region has mild weather.", "Different regions have different customs."]
+    },
+    "relevant": {
+      "definition": "Connected with what is happening or being discussed",
+      "part_of_speech": "adjective",
+      "examples": ["That information is not relevant.", "Choose relevant examples for your essay."]
+    },
+    "rely": {
+      "definition": "To depend on someone or something",
+      "part_of_speech": "verb",
+      "examples": ["We rely on electricity for modern life.", "You can rely on me to help."]
+    },
+    "remove": {
+      "definition": "To take something away from its place",
+      "part_of_speech": "verb",
+      "examples": ["Remove the books from the shelf.", "The stain was difficult to remove."]
+    },
+    "represent": {
+      "definition": "To act or speak officially for someone or something",
+      "part_of_speech": "verb",
+      "examples": ["The ambassador represents her country.", "This graph represents the data."]
+    },
+    "require": {
+      "definition": "To need something or make something necessary",
+      "part_of_speech": "verb",
+      "examples": ["The job requires computer skills.", "Plants require sunlight to grow."]
+    },
+    "research": {
+      "definition": "A detailed study of a subject, especially in order to discover new information",
+      "part_of_speech": "noun",
+      "examples": ["Scientific research advances knowledge.", "The student did research for her paper."]
+    },
+    "resource": {
+      "definition": "A useful or valuable possession or quality of a country, organization, or person",
+      "part_of_speech": "noun",
+      "examples": ["Oil is an important natural resource.", "The library is a valuable resource."]
+    },
+    "respond": {
+      "definition": "To react to something that has been said or done",
+      "part_of_speech": "verb",
+      "examples": ["How did she respond to your question?", "Plants respond to sunlight."]
+    },
+    "role": {
+      "definition": "The function or position that someone has in a situation or organization",
+      "part_of_speech": "noun",
+      "examples": ["Teachers play an important role in education.", "What is your role in the project?"]
+    },
+    "section": {
+      "definition": "One of the parts that something is divided into",
+      "part_of_speech": "noun",
+      "examples": ["The library has a fiction section.", "This section of the test is difficult."]
+    },
+    "sector": {
+      "definition": "One of the areas into which the economic activity of a country is divided",
+      "part_of_speech": "noun",
+      "examples": ["The technology sector is growing.", "Agriculture is an important sector."]
+    },
+    "select": {
+      "definition": "To choose someone or something from a group",
+      "part_of_speech": "verb",
+      "examples": ["Select your favorite color.", "The committee selected three candidates."]
+    },
+    "significant": {
+      "definition": "Important or noticeable",
+      "part_of_speech": "adjective",
+      "examples": ["This is a significant discovery.", "There has been a significant improvement."]
+    },
+    "similar": {
+      "definition": "Looking or being almost the same as something else",
+      "part_of_speech": "adjective",
+      "examples": ["The two paintings are very similar.", "Cats and dogs are similar in some ways."]
+    },
+    "source": {
+      "definition": "The place something comes from or starts at",
+      "part_of_speech": "noun",
+      "examples": ["The river is the source of drinking water.", "Cite your sources in research papers."]
+    },
+    "specific": {
+      "definition": "Clear and exact; particular and not general",
+      "part_of_speech": "adjective",
+      "examples": ["Give me specific instructions.", "The recipe calls for specific ingredients."]
+    },
+    "structure": {
+      "definition": "The way in which the parts of something are connected together, arranged, or organized",
+      "part_of_speech": "noun",
+      "examples": ["The structure of DNA is complex.", "The building has a strong structure."]
+    },
+    "theory": {
+      "definition": "A formal statement of the rules on which a subject of study is based or of ideas that are suggested to explain a fact or event",
+      "part_of_speech": "noun",
+      "examples": ["Einstein's theory of relativity.", "Darwin's theory of evolution."]
+    },
+    "therefore": {
+      "definition": "For that reason; consequently",
+      "part_of_speech": "adverb",
+      "examples": ["It rained, therefore the game was cancelled.", "He studied hard, therefore he passed the test."]
+    },
+    "though": {
+      "definition": "Despite the fact that; although",
+      "part_of_speech": "conjunction",
+      "examples": ["Though it was raining, we went outside.", "She's smart, though sometimes quiet."]
+    },
+    "tradition": {
+      "definition": "A belief, custom, or way of doing something that has existed for a long time",
+      "part_of_speech": "noun",
+      "examples": ["Family traditions are important.", "Cultural traditions vary around the world."]
+    },
+    "transfer": {
+      "definition": "To move from one place to another",
+      "part_of_speech": "verb",
+      "examples": ["Transfer the data to the new computer.", "The player transferred to another team."]
+    },
+    "transport": {
+      "definition": "To take something or someone from one place to another",
+      "part_of_speech": "verb",
+      "examples": ["Trucks transport goods across the country.", "The bus transports students to school."]
+    },
+    "typical": {
+      "definition": "Showing the usual qualities or characteristics of a particular type of person, thing, or group",
+      "part_of_speech": "adjective",
+      "examples": ["This is typical winter weather.", "What's typical behavior for this age group?"]
+    },
+    "united": {
+      "definition": "Joined together, especially for a common purpose",
+      "part_of_speech": "adjective",
+      "examples": ["The United Nations works for peace.", "The team is united in their goal."]
+    },
+    "university": {
+      "definition": "An institution of higher education and research",
+      "part_of_speech": "noun",
+      "examples": ["Many students attend university after high school.", "Harvard is a famous university."]
+    },
+    "variety": {
+      "definition": "The quality or state of being different or varied",
+      "part_of_speech": "noun",
+      "examples": ["The store offers a variety of products.", "Dietary variety is important for health."]
+    },
+    "version": {
+      "definition": "A particular form of something that differs in some respect from other forms of the same thing",
+      "part_of_speech": "noun",
+      "examples": ["This is the latest version of the software.", "There are different versions of the story."]
+    },
+    "volume": {
+      "definition": "The amount of space that a substance or object occupies",
+      "part_of_speech": "noun",
+      "examples": ["The volume of water in the tank.", "Speak at a louder volume."]
+    },
+    "welfare": {
+      "definition": "The health, happiness, and fortunes of a person or group",
+      "part_of_speech": "noun",
+      "examples": ["The government provides welfare programs.", "Animal welfare is important."]
+    }
+  }
+}

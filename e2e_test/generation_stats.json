@@ -1,0 +1,34 @@
+{
+  "total_samples": 30,
+  "samples_by_type": {
+    "conversation": 10,
+    "written_essay": 7,
+    "written_paragraph": 13
+  },
+  "samples_by_grade": {
+    "6": 30
+  },
+  "vocabulary_usage": {
+    "particular": 4,
+    "necessary": 3,
+    "gradually": 3,
+    "detail": 2,
+    "occur": 2,
+    "feature": 2,
+    "portion": 2,
+    "tradition": 2,
+    "theory": 2,
+    "document": 2,
+    "factor": 2,
+    "character": 2,
+    "multiple": 2,
+    "published": 2,
+    "majority": 2,
+    "component": 2,
+    "sometimes": 2,
+    "variety": 2,
+    "analyze": 2,
+    "locate": 2
+  },
+  "generation_timestamp": "2025-11-10T21:04:30.223012"
+}

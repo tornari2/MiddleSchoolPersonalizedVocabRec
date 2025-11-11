@@ -1,0 +1,110 @@
+{
+  "timestamp": "2025-11-10T21:53:52.894146",
+  "tests_run": [
+    "system_initialization",
+    "reference_data_integrity",
+    "data_generation",
+    "data_quality",
+    "vocabulary_consistency"
+  ],
+  "passed": 5,
+  "failed": 0,
+  "warnings": 0,
+  "details": {
+    "system_initialization": true,
+    "reference_data_integrity": {
+      "passed": true,
+      "checks": [
+        "grade_words_availability",
+        "word_definitions",
+        "word_frequencies"
+      ],
+      "issues": []
+    },
+    "data_generation": {
+      "passed": true,
+      "output_file": "test_output_1762833232/student_text_samples.jsonl",
+      "stats": {
+        "total_samples": 600,
+        "grade_distribution": {
+          "6": 210,
+          "7": 210,
+          "8": 180
+        },
+        "sample_types": {
+          "conversation": 200,
+          "written_essay": 140,
+          "written_paragraph": 260
+        }
+      }
+    },
+    "data_quality": {
+      "passed": true,
+      "quality_metrics": {
+        "avg_text_length": 217.58,
+        "min_text_length": 40,
+        "max_text_length": 321,
+        "unique_vocab_words": 84,
+        "grade_appropriate_rate": 1.0
+      }
+    },
+    "vocabulary_consistency": {
+      "passed": true,
+      "consistency_metrics": {
+        "grade_vocab_diversity": {
+          "6": 123,
+          "7": 361,
+          "8": 289
+        },
+        "top_vocab_words": [
+          [
+            "function",
+            11
+          ],
+          [
+            "remove",
+            10
+          ],
+          [
+            "survey",
+            10
+          ],
+          [
+            "equipped",
+            10
+          ],
+          [
+            "context",
+            9
+          ],
+          [
+            "rely",
+            9
+          ],
+          [
+            "hierarchy",
+            9
+          ],
+          [
+            "express",
+            9
+          ],
+          [
+            "issue",
+            9
+          ],
+          [
+            "volume",
+            8
+          ]
+        ],
+        "vocab_distribution": 720
+      }
+    }
+  },
+  "summary": {
+    "total_tests": 5,
+    "pass_rate": 1.0,
+    "overall_status": "PASSED"
+  }
+}

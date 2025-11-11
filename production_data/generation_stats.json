@@ -1,0 +1,36 @@
+{
+  "total_samples": 600,
+  "samples_by_type": {
+    "conversation": 200,
+    "written_essay": 140,
+    "written_paragraph": 260
+  },
+  "samples_by_grade": {
+    "6": 210,
+    "7": 210,
+    "8": 180
+  },
+  "vocabulary_usage": {
+    "function": 11,
+    "remove": 10,
+    "survey": 10,
+    "equipped": 10,
+    "context": 9,
+    "rely": 9,
+    "hierarchy": 9,
+    "express": 9,
+    "issue": 9,
+    "volume": 8,
+    "dominant": 8,
+    "gender": 8,
+    "furthermore": 8,
+    "construct": 8,
+    "relevant": 8,
+    "select": 7,
+    "sometimes": 7,
+    "communicate": 7,
+    "maintain": 7,
+    "legislation": 7
+  },
+  "generation_timestamp": "2025-11-10T22:39:32.325732"
+}
