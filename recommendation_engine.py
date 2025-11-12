@@ -22,6 +22,7 @@ import math
 import random
 
 from reference_data_loader import ReferenceDataLoader
+from openai_service import OpenAIService, RecommendationConfig
 
 logger = logging.getLogger(__name__)
 
@@ -33,14 +34,37 @@ class RecommendationEngine:
     educational standards to recommend the most appropriate vocabulary words.
     """
 
-    def __init__(self, reference_data_loader: Optional[ReferenceDataLoader] = None):
+    def __init__(self, reference_data_loader: Optional[ReferenceDataLoader] = None,
+                 use_openai_enhancement: bool = False):
         """
         Initialize the recommendation engine.
 
         Args:
             reference_data_loader: Pre-loaded reference data, or None to load automatically
+            use_openai_enhancement: Whether to use OpenAI for enhanced recommendations
         """
         self.reference_loader = reference_data_loader or ReferenceDataLoader()
+        self.use_openai_enhancement = use_openai_enhancement
+        self.openai_service = None
+
+        # Initialize OpenAI service if enhancement is enabled
+        if self.use_openai_enhancement:
+            try:
+                import os
+                from dotenv import load_dotenv
+                load_dotenv()  # Load environment variables
+
+                if os.getenv('USE_OPENAI_RECOMMENDATIONS', 'false').lower() == 'true':
+                    config = RecommendationConfig()
+                    self.openai_service = OpenAIService(config=config)
+                    logger.info("✅ OpenAI enhancement enabled for recommendations")
+                else:
+                    self.use_openai_enhancement = False
+                    logger.info("ℹ️  OpenAI enhancement disabled (USE_OPENAI_RECOMMENDATIONS=false)")
+            except Exception as e:
+                logger.warning(f"⚠️  OpenAI enhancement initialization failed: {e}")
+                logger.warning("Falling back to standard algorithm")
+                self.use_openai_enhancement = False
 
         # Algorithm configuration
         self.algorithm_config = {
@@ -116,6 +140,22 @@ class RecommendationEngine:
             formatted_recommendations = self._format_recommendations(
                 student_id, recommendations, grade_level, vocabulary_gaps
             )
+
+            # Step 6: Optionally enhance with OpenAI
+            if self.use_openai_enhancement and self.openai_service:
+                try:
+                    logger.info("🤖 Enhancing recommendations with OpenAI")
+                    enhanced_recommendations = self._enhance_with_openai(
+                        student_profile, linguistic_analysis, formatted_recommendations
+                    )
+                    if enhanced_recommendations:
+                        formatted_recommendations = enhanced_recommendations
+                        logger.info("✅ OpenAI enhancement applied successfully")
+                    else:
+                        logger.warning("⚠️  OpenAI enhancement returned no results, using standard recommendations")
+                except Exception as e:
+                    logger.warning(f"⚠️  OpenAI enhancement failed: {e}")
+                    logger.warning("Using standard algorithm recommendations")
 
             logger.info(f"Generated {len(formatted_recommendations['recommendations'])} recommendations for student {student_id}")
 
@@ -200,12 +240,21 @@ class RecommendationEngine:
         # Get grade-appropriate words from reference data
         grade_range = range(max(6, grade_level - 1), min(8, grade_level + 1) + 1)  # ±1 grade range, stay within 6-8
 
+        # Use a dictionary to deduplicate words by keeping the most appropriate grade level
+        word_candidates = {}
+
         for grade in grade_range:
             grade_data = self.reference_loader.get_all_grade_words(grade)
             if grade_data:
                 # Convert the dictionary format to list of word dictionaries
                 for level, words in grade_data.items():
                     for word in words:
+                        word_key = word.lower()  # Case-insensitive deduplication
+
+                        # Skip if we already have this word
+                        if word_key in word_candidates:
+                            continue
+
                         # Get additional word data
                         freq_data = self.reference_loader.get_word_frequency(word)
                         def_data = self.reference_loader.get_word_definition(word)
@@ -219,7 +268,10 @@ class RecommendationEngine:
                             'part_of_speech': def_data.get('part_of_speech', 'noun') if def_data else 'noun',
                             'context': def_data.get('example_sentence', '') if def_data else ''
                         }
-                        candidates.append(candidate)
+                        word_candidates[word_key] = candidate
+
+        # Convert back to list
+        candidates = list(word_candidates.values())
 
         # Filter and prioritize based on gap areas
         primary_gaps = vocabulary_gaps.get('primary_gap_areas', [])
@@ -436,18 +488,32 @@ class RecommendationEngine:
                                   grade_level: int) -> List[Dict[str, Any]]:
         """Select top 10 recommendations with diversity considerations."""
         if len(scored_candidates) <= 10:
-            return scored_candidates
+            # Even if we have 10 or fewer, deduplicate them
+            seen_words = set()
+            deduplicated = []
+            for candidate in scored_candidates:
+                word = candidate.get('word', '').lower()
+                if word not in seen_words:
+                    seen_words.add(word)
+                    deduplicated.append(candidate)
+            return deduplicated
 
-        # Select top candidates with diversity
+        # Select top candidates with diversity and deduplication
         selected = []
         academic_count = 0
         content_count = 0
+        seen_words = set()
 
         for candidate in scored_candidates:
             if len(selected) >= 10:
                 break
 
             word = candidate.get('word', '').lower()
+
+            # Skip if we've already selected this word
+            if word in seen_words:
+                continue
+
             is_academic = word in self.academic_words
 
             # Ensure balance between academic and content words
@@ -457,6 +523,7 @@ class RecommendationEngine:
                 continue
 
             selected.append(candidate)
+            seen_words.add(word)
             if is_academic:
                 academic_count += 1
             else:
@@ -509,6 +576,67 @@ class RecommendationEngine:
                 'recommendation_count': len(formatted_recommendations)
             }
         }
+
+    def _enhance_with_openai(self, student_profile: Dict[str, Any],
+                           linguistic_analysis: Dict[str, Any],
+                           current_recommendations: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+        """
+        Enhance recommendations using OpenAI.
+
+        Args:
+            student_profile: Student profile data
+            linguistic_analysis: Linguistic analysis results
+            current_recommendations: Current algorithm-based recommendations
+
+        Returns:
+            Enhanced recommendations dictionary or None if enhancement fails
+        """
+        if not self.openai_service:
+            return None
+
+        try:
+            # Extract current recommendations for context
+            current_recs = current_recommendations.get('recommendations', [])
+
+            # Extract writing samples from linguistic analysis for context
+            writing_samples = linguistic_analysis.get('writing_samples', [])
+
+            # Generate enhanced recommendations
+            enhanced_recs = self.openai_service.generate_vocabulary_recommendations(
+                student_profile=student_profile,
+                writing_samples=writing_samples,
+                current_recommendations=current_recs,
+                grade_level=student_profile.get('grade_level', 7)
+            )
+
+            if not enhanced_recs:
+                return None
+
+            # Merge OpenAI recommendations with current ones
+            # Prioritize OpenAI recommendations but include some from original algorithm
+            merged_recommendations = enhanced_recs[:7]  # Top 7 from OpenAI
+
+            # Add 3 more from original algorithm that aren't duplicates
+            openai_words = {rec['word'].lower() for rec in enhanced_recs}
+            additional_recs = [
+                rec for rec in current_recs[:5]
+                if rec.get('word', '').lower() not in openai_words
+            ][:3]  # Up to 3 additional
+
+            merged_recommendations.extend(additional_recs)
+
+            # Update the recommendations structure
+            enhanced_result = current_recommendations.copy()
+            enhanced_result['recommendations'] = merged_recommendations
+            enhanced_result['recommendation_metadata']['enhancement_applied'] = True
+            enhanced_result['recommendation_metadata']['openai_recommendations_count'] = len(enhanced_recs)
+            enhanced_result['recommendation_metadata']['algorithm_version'] = f"{self.algorithm_config['version']}-openai-enhanced"
+
+            return enhanced_result
+
+        except Exception as e:
+            logger.error(f"OpenAI enhancement failed: {e}")
+            return None
 
 def main():
     """Test the recommendation engine."""

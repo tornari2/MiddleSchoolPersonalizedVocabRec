@@ -17,7 +17,7 @@ Usage:
 import json
 import argparse
 from pathlib import Path
-from typing import Dict, List, Any, Tuple
+from typing import Dict, List, Any, Tuple, Optional
 import logging
 from datetime import datetime
 

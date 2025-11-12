@@ -22,6 +22,8 @@ try:
     from recommendation_engine import RecommendationEngine
     from reference_data_loader import ReferenceDataLoader
     from auth_utils import CognitoJWTVerifier
+    from schema_validation import validate_recommendation_result, ValidationError
+    from openai_service import OpenAIService
 except ImportError:
     # Fallback for local testing
     import sys
@@ -29,6 +31,8 @@ except ImportError:
     from recommendation_engine import RecommendationEngine
     from reference_data_loader import ReferenceDataLoader
     from auth_utils import CognitoJWTVerifier
+    from schema_validation import validate_recommendation_result, ValidationError
+    from openai_service import OpenAIService
 
 # Set up logging
 logger = logging.getLogger()
@@ -37,6 +41,7 @@ logger.setLevel(logging.INFO)
 # AWS clients
 dynamodb_client = boto3.client('dynamodb')
 s3_client = boto3.client('s3')
+secrets_client = boto3.client('secretsmanager')
 
 # Environment variables
 PROFILES_TABLE = os.environ.get('PROFILES_TABLE', 'vocab-rec-engine-vocabulary-profiles-dev')
@@ -44,9 +49,38 @@ RECOMMENDATIONS_TABLE = os.environ.get('RECOMMENDATIONS_TABLE', 'vocab-rec-engin
 ANALYTICS_TABLE = os.environ.get('ANALYTICS_TABLE', 'vocab-rec-engine-recommendation-analytics-dev')
 OUTPUT_BUCKET = os.environ.get('OUTPUT_BUCKET', 'vocab-rec-engine-output-reports-dev')
 
+# OpenAI Configuration
+OPENAI_API_KEY_SECRET = os.environ.get('OPENAI_API_KEY_SECRET')
+USE_OPENAI_RECOMMENDATIONS = os.environ.get('USE_OPENAI_RECOMMENDATIONS', 'false').lower() == 'true'
+
 # Cognito configuration
 USER_POOL_ID = os.environ.get('USER_POOL_ID', 'us-east-1_4l091bzTD')
 AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
+
+def get_openai_api_key():
+    """
+    Retrieve OpenAI API key from AWS Secrets Manager.
+
+    Returns:
+        str: The OpenAI API key, or None if not configured/enabled
+    """
+    if not USE_OPENAI_RECOMMENDATIONS or not OPENAI_API_KEY_SECRET:
+        return None
+
+    try:
+        response = secrets_client.get_secret_value(SecretId=OPENAI_API_KEY_SECRET)
+
+        # Parse the secret (assuming it's stored as plain text)
+        if 'SecretString' in response:
+            return response['SecretString']
+        else:
+            # Handle binary secrets (if stored as binary)
+            import base64
+            return base64.b64decode(response['SecretBinary']).decode('utf-8')
+
+    except Exception as e:
+        logger.warning(f"Failed to retrieve OpenAI API key from Secrets Manager: {e}")
+        return None
 
 # Initialize JWT verifier (lazy loading for Lambda optimization)
 _jwt_verifier = None
@@ -58,9 +92,42 @@ def get_jwt_verifier():
         _jwt_verifier = CognitoJWTVerifier(USER_POOL_ID, AWS_REGION)
     return _jwt_verifier
 
+# Initialize reference data loader (global caching for Lambda optimization)
+_reference_data_loader = None
+
+def get_reference_data_loader():
+    """Get or create reference data loader instance with global caching."""
+    global _reference_data_loader
+    if _reference_data_loader is None:
+        try:
+            _reference_data_loader = ReferenceDataLoader()
+            logger.info("Initialized reference data loader with global caching")
+        except Exception as e:
+            logger.error(f"Failed to initialize reference data loader: {e}")
+            raise
+    return _reference_data_loader
+
+# Initialize spaCy model (global caching for Lambda optimization)
+_spacy_model = None
+
+def get_spacy_model(model_name: str = "en_core_web_sm"):
+    """Get or load spaCy model with global caching. Falls back to simple processing if spaCy unavailable."""
+    global _spacy_model
+    if _spacy_model is None:
+        try:
+            import spacy
+            _spacy_model = spacy.load(model_name)
+            logger.info(f"Loaded spaCy model '{model_name}' with global caching")
+        except Exception as e:
+            logger.warning(f"spaCy not available ({e}), using fallback processing")
+            # Set a flag to indicate we're using fallback mode
+            _spacy_model = "FALLBACK_MODE"
+    return _spacy_model
+
 def authenticate_request(event):
     """
     Authenticate the incoming request using JWT verification.
+    Allows Step Function invocations without JWT authentication.
 
     Args:
         event: Lambda event (may contain Authorization header)
@@ -69,6 +136,19 @@ def authenticate_request(event):
         Dict with authentication result
     """
     try:
+        # Allow Step Function invocations (they come from AWS Step Functions service)
+        # Check for Step Function execution context
+        if ('student_id' in event and 'batch_mode' in event) or \
+           event.get('source') == 'aws.states':
+            logger.info("Step Function invocation detected - bypassing JWT authentication")
+            return {
+                'authenticated': True,
+                'user_info': {
+                    'user_id': 'step-function-service',
+                    'user_type': 'service'
+                }
+            }
+
         # Check for Authorization header
         auth_header = None
 
@@ -211,8 +291,18 @@ def process_student_recommendations(student_id: str) -> Dict[str, Any]:
         # Extract linguistic analysis from profile
         linguistic_analysis = extract_linguistic_analysis(profile_data)
 
-        # Initialize recommendation engine
-        engine = RecommendationEngine()
+        # Initialize recommendation engine with cached reference data loader
+        reference_loader = get_reference_data_loader()
+
+        # Enable OpenAI enhancement if configured and API key is available
+        use_openai = USE_OPENAI_RECOMMENDATIONS and get_openai_api_key() is not None
+        if use_openai:
+            logger.info(f"Enabling OpenAI enhancement for student {student_id}")
+
+        engine = RecommendationEngine(
+            reference_data_loader=reference_loader,
+            use_openai_enhancement=use_openai
+        )
 
         # Generate recommendations
         recommendations = engine.generate_recommendations(
@@ -224,8 +314,19 @@ def process_student_recommendations(student_id: str) -> Dict[str, Any]:
         if 'error' in recommendations:
             raise ValueError(f"Recommendation generation failed: {recommendations['error']}")
 
+        # Validate recommendation output
+        try:
+            validated_recommendations = validate_recommendation_result(recommendations)
+            logger.info(f"Successfully validated recommendation output for student {student_id}")
+        except ValidationError as e:
+            logger.error(f"Output validation failed for student {student_id}: {e.message}")
+            # For now, continue with original recommendations but log the error
+            # In production, you might want to fail the request
+            logger.warning("Continuing with unvalidated recommendations despite validation errors")
+            validated_recommendations = recommendations
+
         # Store recommendations in DynamoDB
-        store_recommendations(recommendations)
+        store_recommendations(validated_recommendations)
 
         # Store recommendations report in S3 (optional)
         store_recommendations_report(recommendations)
@@ -306,40 +407,75 @@ def extract_linguistic_analysis(profile_data: Dict[str, Any]) -> Dict[str, Any]:
 
     return analysis
 
-def store_recommendations(recommendations: Dict[str, Any]):
+def store_recommendations(recommendations: Any):
     """
     Store generated recommendations in DynamoDB.
 
     Args:
-        recommendations: Recommendation data to store
+        recommendations: Validated RecommendationResult object or dict to store
     """
     try:
-        student_id = recommendations['student_id']
-        recommendation_date = recommendations['recommendation_metadata']['processing_timestamp']
+        # Handle both Pydantic objects and dictionaries
+        if hasattr(recommendations, 'student_id'):
+            student_id = recommendations.student_id
+            base_timestamp = recommendations.recommendation_metadata.processing_timestamp
+            recs = recommendations.recommendations
+        else:
+            student_id = recommendations['student_id']
+            base_timestamp = recommendations['recommendation_metadata']['processing_timestamp']
+            recs = recommendations['recommendations']
 
-        # Store each recommendation
-        for rec in recommendations['recommendations']:
+        # Store each recommendation with unique timestamp
+        for i, rec in enumerate(recs):
+            # Handle both Pydantic objects and dictionaries
+            if hasattr(rec, 'word'):
+                rec_data = {
+                    'recommendation_id': rec.recommendation_id,
+                    'word': rec.word,
+                    'definition': rec.definition,
+                    'part_of_speech': rec.part_of_speech,
+                    'context': rec.context,
+                    'grade_level': rec.grade_level,
+                    'frequency_score': rec.frequency_score,
+                    'academic_utility': rec.academic_utility,
+                    'gap_relevance_score': rec.gap_relevance_score,
+                    'total_score': rec.total_score,
+                    'recommendation_rank': rec.recommendation_rank,
+                    'algorithm_version': rec.algorithm_version,
+                    'scoring_factors': rec.scoring_factors,
+                    'rationale': rec.rationale,
+                    'learning_objectives': rec.learning_objectives,
+                    'is_viewed': rec.is_viewed,
+                    'is_practiced': rec.is_practiced,
+                    'created_at': rec.created_at
+                }
+            else:
+                rec_data = rec
+
+            # Add microseconds to make each recommendation timestamp unique
+            unique_timestamp = f"{base_timestamp[:-6]}{str(i).zfill(6)}"  # Replace microseconds with counter
+            logger.info(f"Storing recommendation {i+1}/10: {rec_data['word']} with timestamp {unique_timestamp}")
             item = {
                 'student_id': {'S': student_id},
-                'recommendation_date': {'S': recommendation_date},
-                'recommendation_id': {'S': rec['recommendation_id']},
-                'word': {'S': rec['word']},
-                'definition': {'S': rec['definition']},
-                'part_of_speech': {'S': rec.get('part_of_speech', 'noun')},
-                'context': {'S': rec.get('context', '')},
-                'grade_level': {'N': str(rec['grade_level'])},
-                'frequency_score': {'N': str(rec['frequency_score'])},
-                'academic_utility': {'S': rec['academic_utility']},
-                'gap_relevance_score': {'N': str(rec.get('gap_relevance_score', 0.5))},
-                'total_score': {'N': str(rec['total_score'])},
-                'recommendation_rank': {'N': str(rec['recommendation_rank'])},
-                'algorithm_version': {'S': rec.get('algorithm_version', '1.0')},
-                'scoring_factors': {'S': json.dumps(rec.get('scoring_factors', {}))},
-                'rationale': {'S': rec.get('rationale', '')},
-                'learning_objectives': {'S': json.dumps(rec.get('learning_objectives', []))},
+                'recommendation_date': {'S': unique_timestamp},
+                'recommendation_id': {'S': rec_data['recommendation_id']},
+                'word': {'S': rec_data['word']},
+                'definition': {'S': rec_data['definition']},
+                'part_of_speech': {'S': rec_data.get('part_of_speech', 'noun')},
+                'context': {'S': rec_data.get('context', '')},
+                'grade_level': {'N': str(rec_data['grade_level'])},
+                'frequency_score': {'N': str(rec_data['frequency_score'])},
+                'academic_utility': {'S': rec_data['academic_utility']},
+                'gap_relevance_score': {'N': str(rec_data.get('gap_relevance_score', 0.5))},
+                'total_score': {'N': str(rec_data['total_score'])},
+                'recommendation_rank': {'N': str(rec_data['recommendation_rank'])},
+                'algorithm_version': {'S': rec_data.get('algorithm_version', '1.0')},
+                'scoring_factors': {'S': json.dumps(rec_data.get('scoring_factors', {}))},
+                'rationale': {'S': rec_data.get('rationale', '')},
+                'learning_objectives': {'S': json.dumps(rec_data.get('learning_objectives', []))},
                 'is_viewed': {'BOOL': False},
                 'is_practiced': {'BOOL': False},
-                'created_at': {'S': rec.get('created_at', datetime.now().isoformat())}
+                'created_at': {'S': rec_data.get('created_at', datetime.now().isoformat())}
             }
 
             dynamodb_client.put_item(
@@ -347,7 +483,8 @@ def store_recommendations(recommendations: Dict[str, Any]):
                 Item=item
             )
 
-        logger.info(f"Stored {len(recommendations['recommendations'])} recommendations for student {student_id}")
+        rec_count = len(recs) if 'recs' in locals() else len(recommendations.get('recommendations', []))
+        logger.info(f"Stored {rec_count} recommendations for student {student_id}")
 
     except Exception as e:
         logger.error(f"Error storing recommendations: {e}")

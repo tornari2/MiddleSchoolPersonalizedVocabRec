@@ -48,6 +48,8 @@ class SyntheticDataGenerator:
 
         # Load templates
         self.templates = self._load_templates()
+        # Enhance templates with more variety
+        self._enhance_templates()
 
     def _load_templates(self) -> Dict[str, Any]:
         """Load writing and conversation templates."""
@@ -208,6 +210,7 @@ class SyntheticDataGenerator:
             "generated_at": datetime.now().isoformat()
         }
 
+
     def generate_conversation_sample(self, student: StudentProfile) -> Dict[str, Any]:
         """
         Generate a conversation sample for a student.
@@ -253,6 +256,52 @@ class SyntheticDataGenerator:
             "vocabulary_focus": vocab_words[:2],
             "generated_at": datetime.now().isoformat()
         }
+
+    def _enhance_templates(self) -> None:
+        """Enhance templates with more variety and realistic content."""
+        # Add more writing templates for better variety
+        self.templates["writing"]["essay"].extend([
+            "The Importance of {topic} in Today's World",
+            "Understanding {topic}: A Modern Perspective",
+            "{topic} and Its Role in Society",
+            "Exploring the Concept of {topic}",
+            "Why {topic} Matters to Everyone",
+            "The Future of {topic} in Our Lives"
+        ])
+
+        self.templates["writing"]["paragraph"].extend([
+            "{topic} is becoming increasingly important in our daily lives. {explanation} This trend shows how {topic} {effect} the way we live. Many people are discovering that {additional_point}. In the end, {summary_point}.",
+            "When we think about {topic}, it's clear that {observation}. This {relationship} demonstrates the value of {topic} in {context}. Experts agree that {additional_point}. Ultimately, {summary_point}.",
+            "One of the most interesting aspects of {topic} is how {definition}. Through {process}, we can see that {outcome}. This {connection} helps us understand why {additional_point}. Therefore, {summary_point}."
+        ])
+
+        # Add more conversation templates
+        self.templates["conversation"]["dialogue"].extend([
+            "Student A: Have you heard about {topic}? Student B: Yeah, I think {opinion}. Student A: Really? I heard that {counterpoint}. Student B: That's interesting because {explanation}.",
+            "Student A: What do you think about {topic}? Student B: I'm not sure, but {viewpoint}. Student A: I see it differently. {alternative_view}. Student B: Why do you think that? Student A: Because {reasoning}.",
+            "Student A: {topic} is everywhere these days. Student B: Totally agree! {opinion}. Student A: But don't you think {counterpoint}? Student B: Hmm, maybe. {explanation}."
+        ])
+
+        # Add more topics for variety
+        self.templates["topics"]["science"].extend([
+            "artificial intelligence", "renewable energy", "ocean conservation",
+            "space exploration", "medical technology", "climate solutions"
+        ])
+
+        self.templates["topics"]["social_studies"].extend([
+            "digital citizenship", "global communication", "economic equality",
+            "historical preservation", "community leadership", "cultural exchange"
+        ])
+
+        self.templates["topics"]["literature"].extend([
+            "digital storytelling", "multimedia narratives", "creative writing",
+            "poetry analysis", "book adaptations", "writing techniques"
+        ])
+
+        self.templates["topics"]["general"].extend([
+            "online learning", "virtual reality", "social media", "gaming culture",
+            "mobile technology", "streaming services", "remote work"
+        ])
 
     def _fill_template(self, template: str, replacements: Dict[str, str]) -> str:
         """

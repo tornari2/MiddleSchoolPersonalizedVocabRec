@@ -330,6 +330,18 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "logs:PutLogEvents"
         ]
         Resource = "arn:aws:logs:*:*:*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "kms:Encrypt",
+          "kms:Decrypt",
+          "kms:ReEncrypt*",
+          "kms:GenerateDataKey",
+          "kms:GenerateDataKeyWithoutPlaintext",
+          "kms:DescribeKey"
+        ]
+        Resource = "arn:aws:kms:${var.aws_region}:${data.aws_caller_identity.current.account_id}:key/*"
       }
     ]
   })
@@ -361,6 +373,44 @@ resource "aws_cognito_user_pool" "educator_pool" {
     Environment = var.environment
     Project     = var.project_name
   }
+}
+
+# OpenAI API Key Secret for Enhanced Recommendations
+resource "aws_secretsmanager_secret" "openai_api_key" {
+  name                    = "${var.project_name}/openai-api-key-${var.environment}"
+  description             = "OpenAI API key for enhanced vocabulary recommendations"
+  recovery_window_in_days = 7
+
+  tags = {
+    Name        = "OpenAI API Key"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+# IAM Policy for Lambda to access OpenAI secret
+resource "aws_iam_policy" "lambda_openai_secrets" {
+  name        = "${var.project_name}-lambda-openai-secrets-${var.environment}"
+  description = "Allow Lambda functions to access OpenAI API key"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "secretsmanager:GetSecretValue"
+        ]
+        Resource = aws_secretsmanager_secret.openai_api_key.arn
+      }
+    ]
+  })
+}
+
+# Attach OpenAI secrets policy to Lambda execution role
+resource "aws_iam_role_policy_attachment" "lambda_openai_secrets" {
+  role       = aws_iam_role.lambda_execution_role.name
+  policy_arn = aws_iam_policy.lambda_openai_secrets.arn
 }
 
 # Cognito User Pool Client
@@ -453,7 +503,6 @@ resource "aws_sfn_state_machine" "vocabulary_processing_workflow" {
         Parameters = {
           "student_id.$" = "$.student_id"
           "batch_mode.$" = "$.batch_mode"
-          "students.$" = "$.students"
         }
         ResultPath = "$.recommendation_results"
         Next = "GenerateReports"
@@ -865,7 +914,7 @@ resource "aws_lambda_function" "data_ingestion" {
   runtime         = "python3.9"
   handler         = "lambda_function.lambda_handler"
   timeout         = 300
-  memory_size     = 256
+  memory_size     = 512
 
   role             = aws_iam_role.lambda_execution_role.arn
 
@@ -951,8 +1000,8 @@ resource "aws_lambda_function" "recommendation_engine" {
   function_name    = "${var.project_name}-recommendation-engine-${var.environment}"
   runtime         = "python3.9"
   handler         = "lambda_function.lambda_handler"
-  timeout         = 300
-  memory_size     = 512
+  timeout         = 600
+  memory_size     = 1024
 
   role             = aws_iam_role.lambda_execution_role.arn
 
@@ -966,6 +1015,12 @@ resource "aws_lambda_function" "recommendation_engine" {
       ANALYTICS_TABLE      = aws_dynamodb_table.recommendation_analytics.name
       OUTPUT_BUCKET        = aws_s3_bucket.output_reports.bucket
       USER_POOL_ID         = aws_cognito_user_pool.educator_pool.id
+      # OpenAI Configuration for Enhanced Recommendations
+      OPENAI_API_KEY_SECRET = aws_secretsmanager_secret.openai_api_key.name
+      OPENAI_MODEL         = "gpt-4o-mini"
+      OPENAI_TEMPERATURE   = "0.2"
+      OPENAI_MAX_TOKENS    = "500"
+      USE_OPENAI_RECOMMENDATIONS = "true"
     }
   }
 
@@ -985,8 +1040,8 @@ resource "aws_lambda_function" "report_generation" {
   function_name    = "${var.project_name}-report-generation-${var.environment}"
   runtime         = "python3.9"
   handler         = "lambda_function.lambda_handler"
-  timeout         = 300
-  memory_size     = 512
+  timeout         = 600
+  memory_size     = 1024
 
   role             = aws_iam_role.lambda_execution_role.arn
 
@@ -1021,4 +1076,264 @@ resource "aws_lambda_layer_version" "recommendation_dependencies" {
 
   filename         = "${path.module}/recommendation_layer.zip"
   source_code_hash = filebase64sha256("${path.module}/recommendation_layer.zip")
+}
+
+# CloudWatch Alarms for System Monitoring
+
+# Lambda Function Error Alarms
+resource "aws_cloudwatch_metric_alarm" "lambda_data_ingestion_errors" {
+  alarm_name          = "${var.project_name}-data-ingestion-errors-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Alert when Data Ingestion Lambda function has errors"
+  alarm_actions       = []
+
+  dimensions = {
+    FunctionName = aws_lambda_function.data_ingestion.function_name
+  }
+
+  tags = {
+    Name        = "Data Ingestion Lambda Errors Alarm"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "lambda_recommendation_engine_errors" {
+  alarm_name          = "${var.project_name}-recommendation-engine-errors-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Alert when Recommendation Engine Lambda function has errors"
+  alarm_actions       = []
+
+  dimensions = {
+    FunctionName = aws_lambda_function.recommendation_engine.function_name
+  }
+
+  tags = {
+    Name        = "Recommendation Engine Lambda Errors Alarm"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "lambda_report_generation_errors" {
+  alarm_name          = "${var.project_name}-report-generation-errors-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Alert when Report Generation Lambda function has errors"
+  alarm_actions       = []
+
+  dimensions = {
+    FunctionName = aws_lambda_function.report_generation.function_name
+  }
+
+  tags = {
+    Name        = "Report Generation Lambda Errors Alarm"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+# Step Function Failure Alarm
+resource "aws_cloudwatch_metric_alarm" "step_function_failures" {
+  alarm_name          = "${var.project_name}-step-function-failures-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "ExecutionsFailed"
+  namespace           = "AWS/States"
+  period              = "300"
+  statistic           = "Sum"
+  threshold           = "1"
+  alarm_description   = "Alert when Step Function executions fail"
+  alarm_actions       = []
+
+  dimensions = {
+    StateMachineArn = aws_sfn_state_machine.vocabulary_processing_workflow.arn
+  }
+
+  tags = {
+    Name        = "Step Function Failures Alarm"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+# Lambda Function Duration Alarms (High Latency)
+resource "aws_cloudwatch_metric_alarm" "lambda_high_duration" {
+  alarm_name          = "${var.project_name}-lambda-high-duration-${var.environment}"
+  comparison_operator = "GreaterThanThreshold"
+  evaluation_periods  = "2"
+  metric_name         = "Duration"
+  namespace           = "AWS/Lambda"
+  period              = "300"
+  statistic           = "Average"
+  threshold           = "300000"  # 5 minutes in milliseconds
+  alarm_description   = "Alert when Lambda functions take too long to execute"
+  alarm_actions       = []
+
+  dimensions = {
+    FunctionName = aws_lambda_function.recommendation_engine.function_name
+  }
+
+  tags = {
+    Name        = "Lambda High Duration Alarm"
+    Environment = var.environment
+    Project     = var.project_name
+  }
+}
+
+# CloudWatch Dashboard for System Monitoring
+resource "aws_cloudwatch_dashboard" "vocabulary_system_dashboard" {
+  dashboard_name = "${var.project_name}-system-dashboard-${var.environment}"
+
+  dashboard_body = jsonencode({
+    widgets = [
+      # Lambda Functions Performance
+      {
+        type   = "metric"
+        x      = 0
+        y      = 0
+        width  = 12
+        height = 6
+
+        properties = {
+          metrics = [
+            ["AWS/Lambda", "Duration", "FunctionName", aws_lambda_function.data_ingestion.function_name, { "label": "Data Ingestion Duration" }],
+            [".", ".", ".", aws_lambda_function.recommendation_engine.function_name, { "label": "Recommendation Engine Duration" }],
+            [".", ".", ".", aws_lambda_function.report_generation.function_name, { "label": "Report Generation Duration" }]
+          ]
+          view    = "timeSeries"
+          stacked = false
+          region  = var.aws_region
+          title   = "Lambda Function Duration (ms)"
+          period  = 300
+        }
+      },
+      # Lambda Functions Invocations
+      {
+        type   = "metric"
+        x      = 12
+        y      = 0
+        width  = 12
+        height = 6
+
+        properties = {
+          metrics = [
+            ["AWS/Lambda", "Invocations", "FunctionName", aws_lambda_function.data_ingestion.function_name, { "label": "Data Ingestion Invocations" }],
+            [".", ".", ".", aws_lambda_function.recommendation_engine.function_name, { "label": "Recommendation Engine Invocations" }],
+            [".", ".", ".", aws_lambda_function.report_generation.function_name, { "label": "Report Generation Invocations" }]
+          ]
+          view    = "timeSeries"
+          stacked = false
+          region  = var.aws_region
+          title   = "Lambda Function Invocations"
+          period  = 300
+        }
+      },
+      # Lambda Functions Errors
+      {
+        type   = "metric"
+        x      = 0
+        y      = 6
+        width  = 12
+        height = 6
+
+        properties = {
+          metrics = [
+            ["AWS/Lambda", "Errors", "FunctionName", aws_lambda_function.data_ingestion.function_name, { "label": "Data Ingestion Errors" }],
+            [".", ".", ".", aws_lambda_function.recommendation_engine.function_name, { "label": "Recommendation Engine Errors" }],
+            [".", ".", ".", aws_lambda_function.report_generation.function_name, { "label": "Report Generation Errors" }]
+          ]
+          view    = "timeSeries"
+          stacked = false
+          region  = var.aws_region
+          title   = "Lambda Function Errors"
+          period  = 300
+        }
+      },
+      # Step Functions Executions
+      {
+        type   = "metric"
+        x      = 12
+        y      = 6
+        width  = 12
+        height = 6
+
+        properties = {
+          metrics = [
+            ["AWS/States", "ExecutionsStarted", "StateMachineArn", aws_sfn_state_machine.vocabulary_processing_workflow.arn, { "label": "Workflow Executions Started" }],
+            [".", "ExecutionsSucceeded", ".", ".", { "label": "Workflow Executions Succeeded" }],
+            [".", "ExecutionsFailed", ".", ".", { "label": "Workflow Executions Failed" }],
+            [".", "ExecutionsTimedOut", ".", ".", { "label": "Workflow Executions Timed Out" }]
+          ]
+          view    = "timeSeries"
+          stacked = false
+          region  = var.aws_region
+          title   = "Step Functions Workflow Status"
+          period  = 300
+        }
+      },
+      # DynamoDB Performance
+      {
+        type   = "metric"
+        x      = 0
+        y      = 12
+        width  = 12
+        height = 6
+
+        properties = {
+          metrics = [
+            ["AWS/DynamoDB", "ConsumedReadCapacityUnits", "TableName", aws_dynamodb_table.vocabulary_profiles.name, { "label": "Profiles Read Capacity" }],
+            [".", "ConsumedWriteCapacityUnits", ".", ".", { "label": "Profiles Write Capacity" }],
+            [".", "ConsumedReadCapacityUnits", "TableName", aws_dynamodb_table.vocabulary_recommendations.name, { "label": "Recommendations Read Capacity" }],
+            [".", "ConsumedWriteCapacityUnits", ".", ".", { "label": "Recommendations Write Capacity" }]
+          ]
+          view    = "timeSeries"
+          stacked = false
+          region  = var.aws_region
+          title   = "DynamoDB Capacity Units"
+          period  = 300
+        }
+      },
+      # S3 Bucket Metrics
+      {
+        type   = "metric"
+        x      = 12
+        y      = 12
+        width  = 12
+        height = 6
+
+        properties = {
+          metrics = [
+            ["AWS/S3", "NumberOfObjects", "BucketName", aws_s3_bucket.input_data.bucket, "StorageType", "AllStorageTypes", { "label": "Input Data Objects" }],
+            [".", ".", "BucketName", aws_s3_bucket.output_reports.bucket, ".", ".", { "label": "Output Reports Objects" }],
+            [".", "BucketSizeBytes", "BucketName", aws_s3_bucket.input_data.bucket, "StorageType", "StandardStorage", { "label": "Input Data Size (Bytes)" }],
+            [".", ".", "BucketName", aws_s3_bucket.output_reports.bucket, ".", ".", { "label": "Output Reports Size (Bytes)" }]
+          ]
+          view    = "timeSeries"
+          stacked = false
+          region  = var.aws_region
+          title   = "S3 Bucket Metrics"
+          period  = 3600
+        }
+      }
+    ]
+  })
+
 }
