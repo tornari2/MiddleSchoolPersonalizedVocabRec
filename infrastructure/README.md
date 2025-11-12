@@ -26,12 +26,12 @@ This directory contains Terraform configuration for the Personalized Vocabulary 
 ### Created Resources:
 
 1. **S3 Buckets**
-   - `vocab-rec-engine-input-data-dev` - For JSONL student text files
-   - `vocab-rec-engine-output-reports-dev` - For generated reports
+   - `vocab-rec-engine-input-data-prod` - For JSONL student text files
+   - `vocab-rec-engine-output-reports-prod` - For generated reports
 
 2. **DynamoDB Tables**
-   - `vocab-rec-engine-vocabulary-profiles-dev` - Student vocabulary profiles
-   - `vocab-rec-engine-vocabulary-recommendations-dev` - Generated recommendations
+   - `vocab-rec-engine-vocabulary-profiles-prod` - Student vocabulary profiles
+   - `vocab-rec-engine-vocabulary-recommendations-prod` - Generated recommendations
 
 3. **IAM Roles & Policies**
    - Lambda execution role with S3, DynamoDB, and CloudWatch permissions
@@ -87,7 +87,7 @@ Edit `terraform.tfvars` to customize:
 ```hcl
 aws_region   = "us-east-1"    # Change AWS region
 project_name = "vocab-rec-engine"  # Change project name
-environment  = "dev"           # Environment: dev, staging, prod
+environment  = "prod"         # Environment: prod
 ```
 
 ## Updating Infrastructure

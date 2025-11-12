@@ -21,7 +21,6 @@ sys.path.append('/opt')  # Lambda layer path
 try:
     from recommendation_engine import RecommendationEngine
     from reference_data_loader import ReferenceDataLoader
-    from auth_utils import CognitoJWTVerifier
     from schema_validation import validate_recommendation_result, ValidationError
     from openai_service import OpenAIService
 except ImportError:
@@ -30,7 +29,6 @@ except ImportError:
     sys.path.append('/Users/michaeltornaritis/Desktop/WK5_MiddleSchoolPersonalizedVocabRec')
     from recommendation_engine import RecommendationEngine
     from reference_data_loader import ReferenceDataLoader
-    from auth_utils import CognitoJWTVerifier
     from schema_validation import validate_recommendation_result, ValidationError
     from openai_service import OpenAIService
 
@@ -53,8 +51,7 @@ OUTPUT_BUCKET = os.environ.get('OUTPUT_BUCKET', 'vocab-rec-engine-output-reports
 OPENAI_API_KEY_SECRET = os.environ.get('OPENAI_API_KEY_SECRET')
 USE_OPENAI_RECOMMENDATIONS = os.environ.get('USE_OPENAI_RECOMMENDATIONS', 'false').lower() == 'true'
 
-# Cognito configuration
-USER_POOL_ID = os.environ.get('USER_POOL_ID', 'us-east-1_4l091bzTD')
+# AWS Region configuration
 AWS_REGION = os.environ.get('AWS_REGION', 'us-east-1')
 
 def get_openai_api_key():
@@ -82,15 +79,6 @@ def get_openai_api_key():
         logger.warning(f"Failed to retrieve OpenAI API key from Secrets Manager: {e}")
         return None
 
-# Initialize JWT verifier (lazy loading for Lambda optimization)
-_jwt_verifier = None
-
-def get_jwt_verifier():
-    """Get or create JWT verifier instance."""
-    global _jwt_verifier
-    if _jwt_verifier is None:
-        _jwt_verifier = CognitoJWTVerifier(USER_POOL_ID, AWS_REGION)
-    return _jwt_verifier
 
 # Initialize reference data loader (global caching for Lambda optimization)
 _reference_data_loader = None
@@ -124,59 +112,6 @@ def get_spacy_model(model_name: str = "en_core_web_sm"):
             _spacy_model = "FALLBACK_MODE"
     return _spacy_model
 
-def authenticate_request(event):
-    """
-    Authenticate the incoming request using JWT verification.
-    Allows Step Function invocations without JWT authentication.
-
-    Args:
-        event: Lambda event (may contain Authorization header)
-
-    Returns:
-        Dict with authentication result
-    """
-    try:
-        # Allow Step Function invocations (they come from AWS Step Functions service)
-        # Check for Step Function execution context
-        if ('student_id' in event and 'batch_mode' in event) or \
-           event.get('source') == 'aws.states':
-            logger.info("Step Function invocation detected - bypassing JWT authentication")
-            return {
-                'authenticated': True,
-                'user_info': {
-                    'user_id': 'step-function-service',
-                    'user_type': 'service'
-                }
-            }
-
-        # Check for Authorization header
-        auth_header = None
-
-        # Check different possible locations for the auth header
-        if 'headers' in event:
-            auth_header = event['headers'].get('Authorization') or event['headers'].get('authorization')
-        elif 'authorizationToken' in event:
-            # API Gateway Lambda authorizer format
-            auth_header = event['authorizationToken']
-
-        if not auth_header:
-            return {
-                'authenticated': False,
-                'error': 'Missing Authorization header'
-            }
-
-        # Verify the JWT token
-        verifier = get_jwt_verifier()
-        auth_result = verifier.validate_request_auth(auth_header)
-
-        return auth_result
-
-    except Exception as e:
-        logger.error(f"Authentication error: {e}")
-        return {
-            'authenticated': False,
-            'error': f'Authentication failed: {str(e)}'
-        }
 
 def lambda_handler(event, context):
     """
@@ -196,21 +131,6 @@ def lambda_handler(event, context):
     """
     try:
         logger.info(f"Received event: {json.dumps(event)}")
-
-        # Authenticate the request
-        auth_result = authenticate_request(event)
-        if not auth_result['authenticated']:
-            logger.warning(f"Authentication failed: {auth_result.get('error', 'Unknown error')}")
-            return {
-                'statusCode': 401,
-                'body': json.dumps({
-                    'error': 'Authentication required',
-                    'message': 'Valid JWT token required in Authorization header'
-                })
-            }
-
-        user_id = auth_result['user_info']['user_id']
-        logger.info(f"Authenticated user: {user_id}")
 
         # Determine how the function was triggered
         if 'student_id' in event:

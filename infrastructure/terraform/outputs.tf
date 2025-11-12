@@ -28,20 +28,6 @@ output "step_functions_role_arn" {
   value       = aws_iam_role.step_functions_role.arn
 }
 
-output "cognito_user_pool_id" {
-  description = "ID of the Cognito user pool"
-  value       = aws_cognito_user_pool.educator_pool.id
-}
-
-output "cognito_user_pool_client_id" {
-  description = "ID of the Cognito user pool client"
-  value       = aws_cognito_user_pool_client.educator_client.id
-}
-
-output "cognito_user_pool_endpoint" {
-  description = "Endpoint of the Cognito user pool"
-  value       = aws_cognito_user_pool.educator_pool.endpoint
-}
 
 output "step_function_arn" {
   description = "ARN of the Step Function state machine"

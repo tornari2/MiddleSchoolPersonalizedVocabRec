@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+"""
+AWS Lambda Function for Data Ingestion
+
+Processes student text data uploaded to S3 and initiates vocabulary analysis.
+"""
+
 import json
 import boto3
 import os
