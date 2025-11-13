@@ -1,0 +1,44 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:GetObject",
+                "s3:PutObject", 
+                "s3:ListBucket"
+            ],
+            "Resource": [
+                "arn:aws:s3:::vocab-rec-engine-input-data-dev",
+                "arn:aws:s3:::vocab-rec-engine-input-data-dev/*",
+                "arn:aws:s3:::vocab-rec-engine-output-reports-dev",
+                "arn:aws:s3:::vocab-rec-engine-output-reports-dev/*"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:PutItem",
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:BatchWriteItem"
+            ],
+            "Resource": [
+                "arn:aws:dynamodb:us-east-1:971422717446:table/vocab-rec-engine-vocabulary-profiles-dev",
+                "arn:aws:dynamodb:us-east-1:971422717446:table/vocab-rec-engine-vocabulary-recommendations-dev"
+            ]
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+            ],
+            "Resource": "arn:aws:logs:*:*:*"
+        }
+    ]
+}
+EOF && echo "✅ Recreated policy file" && aws iam create-policy --policy-name vocab-rec-engine-lambda-policy-dev --policy-document file://lambda_policy.json --region us-east-1

@@ -1,0 +1,14 @@
+{
+  "Records": [
+    {
+      "s3": {
+        "bucket": {
+          "name": "vocab-rec-engine-input-data-dev"
+        },
+        "object": {
+          "key": "test_sample_1762876613.jsonl"
+        }
+      }
+    }
+  ]
+}

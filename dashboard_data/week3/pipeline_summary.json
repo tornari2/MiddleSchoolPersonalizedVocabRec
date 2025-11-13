@@ -1,0 +1,13 @@
+{
+  "week_number": 3,
+  "weeks_included": [
+    1,
+    2,
+    3
+  ],
+  "pipeline_run_date": "2025-11-12T19:51:53.415407",
+  "total_students": 20,
+  "avg_proficiency": 0.6831,
+  "total_recommendations": 200,
+  "avg_recommendations_per_student": 10.0
+}

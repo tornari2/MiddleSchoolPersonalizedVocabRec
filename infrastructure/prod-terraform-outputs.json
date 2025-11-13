@@ -1,0 +1,57 @@
+{
+  "cognito_user_pool_client_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "4gbet2usdcqnae0dp6qdl718h2"
+  },
+  "cognito_user_pool_endpoint": {
+    "sensitive": false,
+    "type": "string",
+    "value": "cognito-idp.us-east-1.amazonaws.com/us-east-1_W2d38Uxeb"
+  },
+  "cognito_user_pool_id": {
+    "sensitive": false,
+    "type": "string",
+    "value": "us-east-1_W2d38Uxeb"
+  },
+  "input_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vocab-rec-engine-input-data-prod"
+  },
+  "lambda_execution_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::971422717446:role/vocab-rec-engine-lambda-execution-role-prod"
+  },
+  "output_bucket_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vocab-rec-engine-output-reports-prod"
+  },
+  "step_function_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:states:us-east-1:971422717446:stateMachine:vocab-rec-engine-processing-workflow-prod"
+  },
+  "step_function_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vocab-rec-engine-processing-workflow-prod"
+  },
+  "step_functions_role_arn": {
+    "sensitive": false,
+    "type": "string",
+    "value": "arn:aws:iam::971422717446:role/vocab-rec-engine-step-functions-role-prod"
+  },
+  "vocabulary_profiles_table_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vocab-rec-engine-vocabulary-profiles-prod"
+  },
+  "vocabulary_recommendations_table_name": {
+    "sensitive": false,
+    "type": "string",
+    "value": "vocab-rec-engine-vocabulary-recommendations-prod"
+  }
+}

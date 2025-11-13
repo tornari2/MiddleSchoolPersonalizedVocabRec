@@ -81,12 +81,12 @@ find python/ -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
 
 # Copy custom modules
 echo "Copying custom modules..."
-cp ../auth_utils.py python/
-cp ../recommendation_engine.py python/
-cp ../reference_data_loader.py python/
-cp ../vocabulary_profiler.py python/
-cp ../schema_validation.py python/
-cp ../openai_service.py python/
+cp ../utils/auth_utils.py python/
+cp ../core/recommendation_engine.py python/
+cp ../utils/reference_data_loader.py python/
+cp ../core/vocabulary_profiler.py python/
+cp ../utils/schema_validation.py python/
+cp ../services/openai_service.py python/
 
 # Copy reference data
 echo "Copying reference data..."

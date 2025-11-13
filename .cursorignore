@@ -1,0 +1,54 @@
+# Cursor IDE ignore patterns
+# Files and directories to ignore in Cursor operations
+
+# API keys and sensitive configuration
+mcp.json
+
+# Python cache and artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+
+# Build artifacts and distributions
+dist/
+build/
+*.egg-info/
+
+# Test outputs and results
+test_results*/
+test_output*/
+*.tar.gz
+
+# Node.js (if any)
+node_modules/
+npm-debug.log*
+
+# AWS and infrastructure artifacts
+.terraform/
+terraform.tfstate*
+*.zip
+
+# Local development files
+.env
+.env.local
+.env.*.local
+

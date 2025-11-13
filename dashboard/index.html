@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Vocabulary Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+    <!-- Student List View -->
+    <div id="student-list-view" class="view active">
+        <header class="dashboard-header">
+            <div class="container">
+                <h1>📚 Vocabulary Dashboard</h1>
+                <p class="subtitle">Middle School Personalized Vocabulary Recommendations</p>
+            </div>
+        </header>
+
+        <div class="container">
+            <div class="controls">
+                <div class="search-box">
+                    <input type="text" id="search-input" placeholder="Search students by name or ID...">
+                </div>
+                <div class="filter-box">
+                    <label>Grade:</label>
+                    <select id="grade-filter">
+                        <option value="all">All Grades</option>
+                        <option value="6">Grade 6</option>
+                        <option value="7">Grade 7</option>
+                        <option value="8">Grade 8</option>
+                    </select>
+                </div>
+                <button id="load-new-data-btn" class="btn btn-primary">
+                    📥 Load New Data (Week 5)
+                </button>
+            </div>
+
+            <div id="student-grid" class="student-grid">
+                <!-- Student cards will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail View -->
+    <div id="student-detail-view" class="view">
+        <header class="dashboard-header detail-header">
+            <div class="container">
+                <button id="back-button" class="btn btn-secondary">← Back to List</button>
+                <div class="student-header-info">
+                    <h1 id="student-name">Student Name</h1>
+                    <p id="student-meta">Student ID | Grade Level</p>
+                </div>
+                <div class="export-buttons">
+                    <button class="btn btn-outline" onclick="printView('standard')">🖨️ Print Report</button>
+                    <button class="btn btn-outline" onclick="exportToCSV()">📊 Export CSV</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="container">
+            <!-- Score Cards -->
+            <div class="score-cards">
+                <div class="score-card">
+                    <div class="score-label">
+                        Proficiency Score
+                        <span class="tooltip-icon" data-tooltip="proficiency">ⓘ</span>
+                    </div>
+                    <div class="score-value" id="proficiency-score">0.000</div>
+                    <div class="score-trend" id="proficiency-trend"></div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">
+                        Vocabulary Richness
+                        <span class="tooltip-icon" data-tooltip="richness">ⓘ</span>
+                    </div>
+                    <div class="score-value" id="richness-score">0.000</div>
+                    <div class="score-trend" id="richness-trend"></div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">
+                        Academic Word Ratio
+                        <span class="tooltip-icon" data-tooltip="academic">ⓘ</span>
+                    </div>
+                    <div class="score-value" id="academic-score">0.000</div>
+                    <div class="score-trend" id="academic-trend"></div>
+                </div>
+            </div>
+
+            <!-- Cumulative Analysis Note -->
+            <div class="analysis-note">
+                <div class="note-icon">📊</div>
+                <div class="note-content">
+                    <strong>Note:</strong> These metrics analyze cumulative writing samples over time.
+                    Scores may fluctuate as more text is analyzed. This is expected behavior.
+                    <span class="tooltip-icon" data-tooltip="cumulative">ⓘ</span>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="charts-section">
+                <h2>Progress Over Time</h2>
+                <div class="charts-grid">
+                    <div class="chart-container">
+                        <h3>Proficiency Score</h3>
+                        <canvas id="proficiency-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Vocabulary Richness</h3>
+                        <canvas id="richness-chart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Academic Word Ratio</h3>
+                        <canvas id="academic-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recommendations Table -->
+            <div class="recommendations-section">
+                <div class="section-header">
+                    <h2>Recommended Vocabulary Words</h2>
+                    <div class="table-controls">
+                        <select id="sort-select">
+                            <option value="score">Sort by Score</option>
+                            <option value="rank">Sort by Rank</option>
+                            <option value="word">Sort by Word</option>
+                            <option value="date">Sort by Date Added</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table id="recommendations-table" class="recommendations-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Word</th>
+                                <th>Definition</th>
+                                <th>Part of Speech</th>
+                                <th>Score
+                                    <span class="tooltip-icon" data-tooltip="rec-score">ⓘ</span>
+                                </th>
+                                <th>Date Added</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recommendations-tbody">
+                            <!-- Table rows will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tooltip Overlay -->
+    <div id="tooltip-overlay" class="tooltip-overlay">
+        <div class="tooltip-content">
+            <button class="tooltip-close">&times;</button>
+            <h3 id="tooltip-title"></h3>
+            <p id="tooltip-text"></p>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner"></div>
+        <p>Loading data...</p>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <!-- Data Scripts -->
+    <script src="dashboard_data.js"></script>
+    <script src="dashboard.js"></script>
+</body>
+</html>
+
